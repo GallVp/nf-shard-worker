@@ -3,11 +3,12 @@ package auth
 import (
 	"context"
 	"errors"
-	"github.com/99designs/gqlgen/graphql"
 	"log/slog"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/99designs/gqlgen/graphql"
 )
 
 type contextKey struct {
@@ -22,8 +23,8 @@ func AuthMiddleware(logger *slog.Logger) func(http.Handler) http.Handler {
 			authHeader := r.Header.Get("Authorization")
 			headerParts := strings.Split(authHeader, " ")
 			if len(headerParts) == 2 || headerParts[0] == "Bearer" {
-				token := headerParts[1]
-				ctx := context.WithValue(r.Context(), userCtxKey, token)
+				workerToken := headerParts[1]
+				ctx := context.WithValue(r.Context(), userCtxKey, workerToken)
 				r = r.WithContext(ctx)
 			}
 
@@ -34,7 +35,7 @@ func AuthMiddleware(logger *slog.Logger) func(http.Handler) http.Handler {
 
 func Authorized() func(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 	return func(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
-		appToken := os.Getenv("TOKEN")
+		appToken := os.Getenv("WORKER_TOKEN")
 		userToken, ok := ctx.Value(userCtxKey).(string)
 		if !ok {
 			return nil, errors.New("access denied: invalid token")

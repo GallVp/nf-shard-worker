@@ -110,7 +110,7 @@ func (s *Service) Execute(ctx context.Context, run runner.RunConfig, runName str
 	s.Wg.Add(1)
 	defer s.Wg.Done()
 
-	// work dir will be manaaaged by float
+	// work dir will be managed by float
 	run = run.RemoveWorkDir()
 
 	tempDir, err := os.MkdirTemp("", "float-runner-")
@@ -122,7 +122,6 @@ func (s *Service) Execute(ctx context.Context, run runner.RunConfig, runName str
 	// generate nextflow command
 	nfArgs := append([]string{s.config.NextflowBinPath, "run", run.PipelineUrl, "-c", "mmc.config"}, run.Args...)
 	nfCommand := strings.Join(nfArgs, " ")
-	fmt.Println(nfCommand)
 
 	s.Logger.Info("float execute", "action", "storing job files")
 	err = s.storeJobFiles(tempDir, run.ConfigOverride, nfCommand)
@@ -135,6 +134,8 @@ func (s *Service) Execute(ctx context.Context, run runner.RunConfig, runName str
 		s.Logger.Error("FLOAT_AWS_SG not set")
 		return "", fmt.Errorf("FLOAT_AWS_SG not set")
 	}
+
+	s.Logger.Info("Submitting nextflow pipeline", "command", nfCommand)
 
 	args := []string{
 		"submit",
@@ -160,7 +161,7 @@ func (s *Service) Execute(ctx context.Context, run runner.RunConfig, runName str
 		s.Logger.Info("float execute", "action", "authenticating")
 		err = s.auth()
 		if err != nil {
-			s.Logger.Error("failed to authenticate", "error", err)
+			s.Logger.Error("float failed to authenticate", "error", err)
 		}
 
 		s.Logger.Info("float execute", "action", "Running command")

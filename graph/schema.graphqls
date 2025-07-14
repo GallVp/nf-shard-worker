@@ -54,8 +54,8 @@ type Mutation {
 }
 
 type Query {
-    healthCheck: Boolean!
-    checkStatus: Boolean! @Authorized
+  healthCheck: Boolean!
+  checkStatus: Boolean! @Authorized
 }
 
 type Subscription {

@@ -4,13 +4,14 @@ services:
   shard-worker:
     build: .
     ports:
-      - "${PORT}:${PORT}"
+      - "${WORKER_PORT}:${WORKER_PORT}"
     environment:
-      - PORT=${PORT}
-      - TOKEN=${TOKEN}
+      - WORKER_PORT=${WORKER_PORT}
+      - WORKER_TOKEN=${WORKER_TOKEN}
       - FLOAT_USER=${FLOAT_USER}
       - FLOAT_PASS=${FLOAT_PASS}
       - FLOAT_AWS_SG=${FLOAT_AWS_SG}
       - FLOAT_CORES=${FLOAT_CORES}
       - FLOAT_MEMORY=${FLOAT_MEMORY}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}

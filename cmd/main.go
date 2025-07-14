@@ -2,16 +2,7 @@ package main
 
 import (
 	"context"
-	"errors"
-	"github.com/99designs/gqlgen/graphql"
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/go-chi/chi"
-	"github.com/gorilla/websocket"
-	"github.com/nats-io/nats.go/jetstream"
-	"github.com/rs/cors"
+	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -28,33 +19,51 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/go-chi/chi"
+	"github.com/gorilla/websocket"
+	"github.com/nats-io/nats.go/jetstream"
+	"github.com/rs/cors"
+
 	"github.com/joho/godotenv"
 	"github.com/nats-io/nats-server/v2/server"
 	"github.com/nats-io/nats.go"
 )
 
+const (
+	natsServerStartTimeout = 5.0 * time.Second
+)
+
 func main() {
 	_ = godotenv.Load()
 
-	authToken := os.Getenv("TOKEN")
-	if authToken == "" {
-		panic("AUTH_TOKEN environment variable is not set")
+	port := os.Getenv("WORKER_PORT")
+	if port == "" {
+		panic("WORKER_PORT environment variable is not set")
 	}
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		panic("PORT environment variable is not set")
+	floatBinPath := os.Getenv("FLOAT_BIN_PATH")
+	if floatBinPath == "" {
+		panic("FLOAT_BIN_PATH environment variable is not set")
 	}
+
+	logLevel := slog.LevelInfo
+	if lvl := os.Getenv("LOG_LEVEL"); lvl != "" {
+		_ = logLevel.UnmarshalText([]byte(lvl))
+	}
+	logOpts := &slog.HandlerOptions{Level: logLevel}
+	logger := slog.New(slog.NewTextHandler(os.Stdout, logOpts))
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
-	logOpts := &slog.HandlerOptions{Level: slog.LevelDebug}
-	logger := slog.New(slog.NewTextHandler(os.Stdout, logOpts))
-
 	nc, _, js, err := RunEmbeddedNatsServer()
 	if err != nil {
-		logger.Error("Failed to start NATS srv", "error", err)
+		logger.Error("Failed to start NATS server", "error", err)
 		return
 	}
 
@@ -75,7 +84,7 @@ func main() {
 	floatConfig := float.Config{
 		Logger:          logger,
 		Wg:              &wg,
-		FloatBinPath:    "float",
+		FloatBinPath:    floatBinPath,
 		NextflowBinPath: "nextflow",
 		Nc:              nc,
 		Js:              js,
@@ -112,8 +121,8 @@ func RunEmbeddedNatsServer() (*nats.Conn, *server.Server, jetstream.JetStream, e
 	}
 
 	go ns.Start()
-	if !ns.ReadyForConnections(5 * time.Second) {
-		return nil, nil, nil, errors.New("nats server not ready for connections")
+	if !ns.ReadyForConnections(natsServerStartTimeout) {
+		return nil, nil, nil, fmt.Errorf("NATS server did not get ready for connections in %s", natsServerStartTimeout)
 	}
 
 	nc, err := nats.Connect(ns.ClientURL())
