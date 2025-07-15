@@ -1,3 +1,6 @@
+default: clean build
+clean:
+	rm -rf build
 build:
 	go build -o build/nf-shard-worker ./cmd
 run:

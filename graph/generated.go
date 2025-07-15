@@ -3436,7 +3436,7 @@ func (ec *executionContext) unmarshalInputExecutor(ctx context.Context, obj any)
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "computeOverride"}
+	fieldsInOrder := [...]string{"name", "configOverride"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3450,13 +3450,13 @@ func (ec *executionContext) unmarshalInputExecutor(ctx context.Context, obj any)
 				return it, err
 			}
 			it.Name = data
-		case "computeOverride":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("computeOverride"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+		case "configOverride":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("configOverride"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ComputeOverride = data
+			it.ConfigOverride = data
 		}
 	}
 
