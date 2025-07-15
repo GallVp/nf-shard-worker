@@ -3,16 +3,24 @@ package runner
 import (
 	"context"
 	"fmt"
-	"github.com/nats-io/nats.go"
 	"log/slog"
-	"nf-shard-orchestrator/graph/model"
-	"nf-shard-orchestrator/pkg/cache"
-	logstream "nf-shard-orchestrator/pkg/streamlogs"
+	"nf-shard-worker/graph/model"
+	"nf-shard-worker/pkg/cache"
+	logstream "nf-shard-worker/pkg/streamlogs"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
+
+	"github.com/nats-io/nats.go"
 
 	petname "github.com/dustinkirkland/golang-petname"
+)
+
+const (
+	StatusCheckTimeout        = 1.0 * time.Second
+	StatusCheckTimeoutMessage = "Status check failed due to timeout"
+	StatusCheckSuccessMessage = "Status check is successful"
 )
 
 func init() {
@@ -34,6 +42,7 @@ type Runner interface {
 	Execute(ctx context.Context, run RunConfig, runName string) (string, error)
 	Stop(s StopConfig) error
 	BinPath() string
+	CheckStatus(ctx context.Context) (bool, string)
 }
 
 func (r RunConfig) CmdArgs() []string {

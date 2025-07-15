@@ -1,5 +1,5 @@
 build:
-	go build -o main ./cmd
+	go build -o build/nf-shard-worker ./cmd
 run:
 	go run ./cmd/main.go
 gqlgen:
