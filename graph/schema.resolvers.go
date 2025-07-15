@@ -21,10 +21,17 @@ import (
 func (r *mutationResolver) RunJob(ctx context.Context, input model.RunJobCommand) (*model.RunJobResponse, error) {
 	r.Logger.Debug("Received request to launch workflow")
 
+	var configOverride string
+	if input.Executor.ConfigOverride != nil {
+		configOverride = *input.Executor.ConfigOverride
+	} else {
+		configOverride = ""
+	}
+
 	run := runner.RunConfig{
 		Args:           input.Args(),
 		PipelineUrl:    input.PipelineURL,
-		ConfigOverride: input.Executor.ComputeOverride,
+		ConfigOverride: configOverride,
 	}
 	run = run.SetRunName(input.RunName)
 
@@ -102,7 +109,6 @@ func (r *queryResolver) HealthCheck(ctx context.Context) (bool, error) {
 
 // CheckStatus is the resolver for the checkStatus field.
 func (r *queryResolver) CheckStatus(ctx context.Context, executor model.Executor) (*model.CheckStatusResponse, error) {
-
 	switch executor.Name {
 	case "float":
 		status, msg := r.FloatService.CheckStatus(ctx)

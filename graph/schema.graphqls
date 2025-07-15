@@ -25,7 +25,7 @@ input Parameter {
 
 input Executor {
   name: String!
-  computeOverride: String!
+  configOverride: String
 }
 
 input RunJobCommand {

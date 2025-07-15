@@ -8,8 +8,8 @@ type CheckStatusResponse struct {
 }
 
 type Executor struct {
-	Name            string `json:"name"`
-	ComputeOverride string `json:"computeOverride"`
+	Name           string  `json:"name"`
+	ConfigOverride *string `json:"configOverride,omitempty"`
 }
 
 type Log struct {
