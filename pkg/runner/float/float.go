@@ -5,9 +5,9 @@ import (
 	_ "embed"
 	"fmt"
 	"log/slog"
-	"nf-shard-orchestrator/graph/model"
-	"nf-shard-orchestrator/pkg/cache"
-	"nf-shard-orchestrator/pkg/runner"
+	"nf-shard-worker/graph/model"
+	"nf-shard-worker/pkg/cache"
+	"nf-shard-worker/pkg/runner"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -19,6 +19,10 @@ import (
 )
 
 var _ runner.Runner = &Service{}
+
+const (
+	InvalidLicenseMessage = "MM Cloud license is not valid. Please update it in MM Cloud"
+)
 
 //go:embed config/job_submit_AWS.sh
 var fileJobSubmitAWS string
@@ -179,10 +183,49 @@ func (s *Service) Execute(ctx context.Context, run runner.RunConfig, runName str
 }
 
 func (s *Service) Stop(c runner.StopConfig) error {
-	// not implemented
-	return nil
+	panic("TODO: Stop for float runner not implement yet!")
 }
 
 func (s *Service) BinPath() string {
 	return s.config.FloatBinPath
+}
+
+func (s *Service) CheckStatus(ctx context.Context) (bool, string) {
+
+	timeoutCtx, cancel := context.WithTimeout(ctx, runner.StatusCheckTimeout)
+	defer cancel()
+
+	cmd := s.statusCommand(timeoutCtx)
+
+	s.Logger.Debug("float execute", "action", "status")
+
+	output, cmdErr := cmd.CombinedOutput()
+	outputStr := string(output)
+
+	s.Logger.Debug("float execute", "action", "status", "response", outputStr)
+
+	if cmdErr == nil && strings.Contains(outputStr, "License Status: valid") {
+		return true, runner.StatusCheckSuccessMessage
+	}
+
+	if cmdErr == nil && !strings.Contains(outputStr, "License Status: valid") {
+		return false, InvalidLicenseMessage
+	}
+
+	<-timeoutCtx.Done()
+
+	if timeoutCtx.Err() == context.DeadlineExceeded {
+		return false, runner.StatusCheckTimeoutMessage
+	}
+
+	return false, fmt.Sprintf("Status check failed with unexpected errors: %v, %v", cmdErr, timeoutCtx.Err())
+}
+
+func (s *Service) statusCommand(ctx context.Context) *exec.Cmd {
+	user := os.Getenv("FLOAT_USER")
+	pass := os.Getenv("FLOAT_PASS")
+	address := os.Getenv("FLOAT_ADDRESS")
+	args := []string{"status", "-a", address, "-u", user, "-p", pass}
+
+	return exec.CommandContext(ctx, s.config.FloatBinPath, args...)
 }

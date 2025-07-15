@@ -17,7 +17,6 @@ directive @goTag(
   value: String
 ) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
 
-
 input Parameter {
   key: String!
   value: String!
@@ -48,21 +47,26 @@ input TerminateJobCommand {
   executor: String!
 }
 
-type Mutation {
-  runJob(input: RunJobCommand!): RunJobResponse! @Authorized
-  terminateJob(input: TerminateJobCommand!): Boolean! @Authorized
+type Log {
+  message: String!
+  timestamp: String!
 }
 
 type Query {
   healthCheck: Boolean!
-  checkStatus: Boolean! @Authorized
+  checkStatus(executor: Executor!): CheckStatusResponse! @Authorized
+}
+
+type Mutation {
+  runJob(input: RunJobCommand!): RunJobResponse! @Authorized
+  terminateJob(input: TerminateJobCommand!): Boolean! @Authorized
 }
 
 type Subscription {
   streamLogs(runName: String!): Log!
 }
 
-type Log {
+type CheckStatusResponse {
+  status: Boolean!
   message: String!
-  timestamp: String!
 }

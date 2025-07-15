@@ -3,10 +3,11 @@ package logstream
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/nats-io/nats.go"
-	"nf-shard-orchestrator/graph/model"
-	"nf-shard-orchestrator/pkg/cache"
+	"nf-shard-worker/graph/model"
+	"nf-shard-worker/pkg/cache"
 	"regexp"
+
+	"github.com/nats-io/nats.go"
 )
 
 const (

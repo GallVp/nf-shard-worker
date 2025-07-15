@@ -2,6 +2,11 @@
 
 package model
 
+type CheckStatusResponse struct {
+	Status  bool   `json:"status"`
+	Message string `json:"message"`
+}
+
 type Executor struct {
 	Name            string `json:"name"`
 	ComputeOverride string `json:"computeOverride"`

@@ -4,18 +4,19 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/nats-io/nats.go"
-	"github.com/nats-io/nats.go/jetstream"
 	"log/slog"
-	"nf-shard-orchestrator/graph/model"
-	"nf-shard-orchestrator/pkg/cache"
-	"nf-shard-orchestrator/pkg/runner"
-	logstream "nf-shard-orchestrator/pkg/streamlogs"
+	"nf-shard-worker/graph/model"
+	"nf-shard-worker/pkg/cache"
+	"nf-shard-worker/pkg/runner"
+	logstream "nf-shard-worker/pkg/streamlogs"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 	"sync"
+
+	"github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go/jetstream"
 )
 
 var _ runner.Runner = &Service{}
@@ -159,4 +160,8 @@ func (s *Service) Stop(c runner.StopConfig) error {
 
 func (s *Service) BinPath() string {
 	return s.Config.BinPath
+}
+
+func (s *Service) CheckStatus(ctx context.Context) (bool, string) {
+	panic("TODO: CheckStatus for nextflow runner not implement yet!")
 }

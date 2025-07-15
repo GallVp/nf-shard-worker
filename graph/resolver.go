@@ -1,13 +1,14 @@
 package graph
 
 import (
+	"log/slog"
+	"nf-shard-worker/graph/model"
+	"nf-shard-worker/pkg/cache"
+	"nf-shard-worker/pkg/runner"
+	"sync"
+
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
-	"log/slog"
-	"nf-shard-orchestrator/graph/model"
-	"nf-shard-orchestrator/pkg/cache"
-	"nf-shard-orchestrator/pkg/runner"
-	"sync"
 )
 
 // This file will not be regenerated automatically.

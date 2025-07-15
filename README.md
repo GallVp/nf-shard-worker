@@ -1,35 +1,25 @@
-# Shard Worker
+[![Build](https://github.com/GallVp/nf-shard-worker/actions/workflows/ci.yml/badge.svg)](https://github.com/GallVp/nf-shard-worker/actions/workflows/ci.yml)
 
-Shard worker executed Nextflow and Float executor workflows from nf-shard.
+# nf-shard-worker
 
-## Deployment instructions
+Worker to launch Nextflow pipelines from [nf-shard](https://github.com/GallVp/nf-shard).
 
-### AWS Fargate
+## Contribution Workflow
 
-```sh
-aws ecs create-cluster --cluster-name shard-worker-cluster
+The contribution workflow is similar to [nf-core](https://nf-co.re) pipelines. Please fork the repo, make changes and create a PR for review and approval to the `dev` branch.
 
-aws ecs register-task-definition --cli-input-json file://task-definition.json
+## Roadmap
 
-aws ecs create-service \
-    --cluster shard-worker-cluster \
-    --service-name shard-worker-service \
-    --task-definition shard-worker-task \
-    --desired-count 1 \
-    --launch-type FARGATE \
-    --network-configuration "awsvpcConfiguration={subnets=[subnet-11111],securityGroups=[sg-11111],assignPublicIp=ENABLED}"
+- [ ] MM Cloud
+- [ ] AWS/MM Batch
+- [ ] SLURM
+- [ ] local
 
-aws ecs update-service \
-    --cluster shard-worker-cluster \
-    --service shard-worker-service \
-    --task-definition shard-worker-task
+## Authors
 
-```
-
-### Terraform
-
-Coming soon
+- Augustinas Malinauskas
+- Usman Rashid
 
 ## Acknowledgements
 
-Dominykas Juodis for his contributions to the project and insightful conversations.
+- Dominykas Juodis for his contributions to the project and insightful conversations.
