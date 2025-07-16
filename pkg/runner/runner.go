@@ -29,6 +29,7 @@ func init() {
 
 type RunConfig struct {
 	PipelineUrl    string
+	WorkDir        string
 	ConfigOverride string
 	Args           []string
 }

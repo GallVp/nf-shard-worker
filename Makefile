@@ -1,4 +1,4 @@
-default: clean build
+default: clean test build
 clean:
 	rm -rf build
 build:
@@ -7,3 +7,5 @@ run:
 	go run ./cmd/main.go
 gqlgen:
 	go run github.com/99designs/gqlgen generate
+test:
+	go test ./...

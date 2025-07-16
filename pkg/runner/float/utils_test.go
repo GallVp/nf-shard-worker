@@ -65,6 +65,54 @@ func TestExtractMountPaths(t *testing.T) {
 	}
 }
 
+func TestValidateBucketName(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		wantErr bool
+	}{
+		{
+			name:    "valid bucket URL",
+			input:   "https://test-juicefs.s3.us-east-1.amazonaws.com",
+			wantErr: false,
+		},
+		{
+			name:    "valid bucket URL with trailing slash",
+			input:   "https://test-juicefs.s3.ap-southeast-2.amazonaws.com/",
+			wantErr: false,
+		},
+		{
+			name:    "invalid missing https",
+			input:   "http://test-juicefs.s3.us-east-1.amazonaws.com",
+			wantErr: true,
+		},
+		{
+			name:    "invalid missing s3 part",
+			input:   "https://test-juicefs.us-east-1.amazonaws.com",
+			wantErr: true,
+		},
+		{
+			name:    "invalid region format",
+			input:   "https://test-juicefs.s3.useast1.amazonaws.com",
+			wantErr: true,
+		},
+		{
+			name:    "invalid missing bucket",
+			input:   "https://.s3.us-east-1.amazonaws.com",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validateBucketName(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("validateBucketName(%q) error = %v, wantErr %v", tt.input, err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func formatStringSlice(slice []string) string {
 	if len(slice) == 0 {
 		return "[]"

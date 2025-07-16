@@ -1,6 +1,7 @@
 package float
 
 import (
+	"fmt"
 	"regexp"
 )
 
@@ -14,4 +15,15 @@ func extractMountPaths(input string) []string {
 		}
 	}
 	return result
+}
+
+func validateBucketName(name string) error {
+
+	bucketPattern := `^https:\/\/\S+\.s3\.[a-z]{2}-[a-z]+-[0-9]\.amazonaws\.com\/?$`
+	re := regexp.MustCompile(bucketPattern)
+	if re.MatchString(name) {
+		return nil
+	}
+
+	return fmt.Errorf("bucket name: %s does not conform to pattern: %s", name, bucketPattern)
 }

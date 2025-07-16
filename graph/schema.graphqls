@@ -32,6 +32,7 @@ input RunJobCommand {
   runName: String!
   pipelineUrl: String!
   executor: Executor!
+  workDir: String!
   parameters: [Parameter!]!
 }
 

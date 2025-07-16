@@ -8,3 +8,5 @@ work/
 .nextflow/
 
 .env
+
+.test.graphql
