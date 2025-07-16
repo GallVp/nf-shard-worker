@@ -33,6 +33,7 @@ type RunJobCommand struct {
 	RunName     string       `json:"runName"`
 	PipelineURL string       `json:"pipelineUrl"`
 	Executor    *Executor    `json:"executor"`
+	WorkDir     string       `json:"workDir"`
 	Parameters  []*Parameter `json:"parameters"`
 }
 

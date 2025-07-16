@@ -3511,7 +3511,7 @@ func (ec *executionContext) unmarshalInputRunJobCommand(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"runName", "pipelineUrl", "executor", "parameters"}
+	fieldsInOrder := [...]string{"runName", "pipelineUrl", "executor", "workDir", "parameters"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3539,6 +3539,13 @@ func (ec *executionContext) unmarshalInputRunJobCommand(ctx context.Context, obj
 				return it, err
 			}
 			it.Executor = data
+		case "workDir":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("workDir"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.WorkDir = data
 		case "parameters":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parameters"))
 			data, err := ec.unmarshalNParameter2ᚕᚖnfᚑshardᚑworkerᚋgraphᚋmodelᚐParameterᚄ(ctx, v)

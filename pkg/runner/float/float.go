@@ -114,6 +114,10 @@ func (s *Service) Execute(ctx context.Context, run runner.RunConfig, runName str
 	s.Wg.Add(1)
 	defer s.Wg.Done()
 
+	if err := validateBucketName(run.WorkDir); err != nil {
+		return "", err
+	}
+
 	// work dir will be managed by float
 	run = run.RemoveWorkDir()
 
@@ -152,7 +156,7 @@ func (s *Service) Execute(ctx context.Context, run runner.RunConfig, runName str
 		"-t", "c5.2xlarge",
 		"-n", "shard-run",
 		"--securityGroup", sg,
-		"--env", "BUCKET=https://cfdx-juicefs.s3.us-east-1.amazonaws.com",
+		"--env", fmt.Sprintf("BUCKET=%s", run.WorkDir),
 		"--hostTerminate", filepath.Join(tempDir, "hostTerminate_AWS.sh"),
 		"-j", filepath.Join(tempDir, "job_submit_AWS.sh"),
 	}

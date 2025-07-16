@@ -29,9 +29,10 @@ func (r *mutationResolver) RunJob(ctx context.Context, input model.RunJobCommand
 	}
 
 	run := runner.RunConfig{
-		Args:           input.Args(),
 		PipelineUrl:    input.PipelineURL,
+		WorkDir:        input.WorkDir,
 		ConfigOverride: configOverride,
+		Args:           input.Args(),
 	}
 	run = run.SetRunName(input.RunName)
 
